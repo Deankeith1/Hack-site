@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Orbit CS2 Satış</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    #authBox {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      z-index: 999;
+    }
+    #authBox input {
+      margin: 5px 0;
+      padding: 6px;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
+    }
+    #authBox button {
+      padding: 6px;
+      width: 100%;
+      background: #a020f0;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    #userGreeting {
+      font-weight: bold;
+    }
+    #checkoutContainer {
+      max-width: 600px;
+      margin: 30px auto;
+      text-align: center;
+    }
+    #fakeCardForm input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: none;
+    }
+    #checkoutBtn {
+      display: none;
+      margin-bottom: 20px;
+      padding: 12px 30px;
+      font-size: 1.2rem;
+      border-radius: 30px;
+      cursor: pointer;
+      background: linear-gradient(90deg, #a020f0, #7a10c4);
+      color: white;
+      border: none;
+      box-shadow: 0 0 20px #a020f0;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="authBox">
+    <div id="registerForm">
+      <h4>Kayıt Ol</h4>
+      <input type="text" id="regUsername" placeholder="Kullanıcı Adı">
+      <input type="password" id="regPassword" placeholder="Şifre">
+      <button onclick="registerUser()">Kayıt Ol</button>
+    </div>
+    <div id="loginForm">
+      <h4>Giriş Yap</h4>
+      <input type="text" id="loginUsername" placeholder="Kullanıcı Adı">
+      <input type="password" id="loginPassword" placeholder="Şifre">
+      <button onclick="loginUser()">Giriş Yap</button>
+    </div>
+    <div id="userGreeting" style="display:none;">
+      Hoş geldin, <span id="greetingName"></span>
+      <button onclick="logoutUser()">Çıkış Yap</button>
+    </div>
+  </div>
+
+  <div class="hero">
+    <video autoplay muted loop id="bgVideo">
+      <source src="background.mp4" type="video/mp4" />
+    </video>
+    <div class="overlay"></div>
+
+    <div class="hero-content">
+      <h1>CS2 Premium Hile Satış</h1>
+      <p>ESP, Aimbot ve daha fazlasına anında erişim!</p>
+      <button id="scrollBtn" class="main-purchase-btn">Satın Al</button>
+    </div>
+  </div>
+
+  <section id="purchaseSection">
+    <h2>Ürünler ve Satın Alma</h2>
+
+    <div class="product-grid">
+      <div class="product-card">
+        <h3>ESP Görüntüleme</h3>
+        <p>Düşmanları duvar arkasından gör.</p>
+        <span class="price">149</span>₺
+        <button class="buyBtn">Bu ürünü Satın Al</button>
+      </div>
+
+      <div class="product-card">
+        <h3>Aimbot Pro</h3>
+        <p>Headshot garantili, akıcı hedef sistemi.</p>
+        <span class="price">199</span>₺
+        <button class="buyBtn">Bu ürünü Satın Al</button>
+      </div>
+
+      <div class="product-card">
+        <h3>Radar Hack</h3>
+        <p>Mini haritada tüm oyuncuları gör.</p>
+        <span class="price">99</span>₺
+        <button class="buyBtn">Bu ürünü Satın Al</button>
+      </div>
+    </div>
+
+    <div id="cart">
+      <h2>🛒 Sepetiniz</h2>
+      <ul id="cartItems"></ul>
+      <p><strong>Toplam:</strong> <span id="cartTotal">0₺</span></p>
+    </div>
+
+    <div id="checkoutContainer">
+      <button id="checkoutBtn">Sepetten Satın Al</button>
+
+      <form id="fakeCardForm" style="display:none; background:#222; padding: 20px; border-radius: 15px; color: white; text-align: left;">
+        <h3>Kart Bilgileri</h3>
+
+        <label for="cardNumber">Kart Numarası</label><br />
+        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" required /><br />
+
+        <label for="expiry">Son Kullanma Tarihi</label><br />
+        <input type="text" id="expiry" placeholder="MM/YY" required /><br />
+
+        <label for="cvv">CVV</label><br />
+        <input type="text" id="cvv" placeholder="123" required /><br />
+
+        <button type="submit">Ödeme Yap</button>
+      </form>
+
+      <div id="thankYouMsg" style="display:none; color:#a0f; font-size:1.5rem; margin-top:20px;">Teşekkürler! Ödemeniz alındı. 🎉</div>
+    </div>
+  </section>
+
+  <script>
+    const users = {};
+    let loggedInUser = null;
+    let cart = [];
+
+    function registerUser() {
+      const u = document.getElementById("regUsername").value.trim();
+      const p = document.getElementById("regPassword").value.trim();
+      if (!u || !p) return alert("Boş alan bırakmayın.");
+      if (users[u]) return alert("Bu kullanıcı zaten var!");
+      users[u] = p;
+      alert("Kayıt başarılı! Şimdi giriş yapabilirsiniz.");
+    }
+
+    function loginUser() {
+      const u = document.getElementById("loginUsername").value.trim();
+      const p = document.getElementById("loginPassword").value.trim();
+      if (users[u] === p) {
+        loggedInUser = u;
+        document.getElementById("registerForm").style.display = 'none';
+        document.getElementById("loginForm").style.display = 'none';
+        document.getElementById("userGreeting").style.display = 'block';
+        document.getElementById("greetingName").textContent = u;
+      } else {
+        alert("Giriş başarısız.");
+      }
+    }
+
+    function logoutUser() {
+      loggedInUser = null;
+      document.getElementById("registerForm").style.display = 'block';
+      document.getElementById("loginForm").style.display = 'block';
+      document.getElementById("userGreeting").style.display = 'none';
+    }
+
+    document.querySelectorAll('.buyBtn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const name = e.target.parentElement.querySelector('h3').innerText;
+        const price = parseInt(e.target.parentElement.querySelector('.price').innerText);
+        cart.push({ name, price });
+        updateCart();
+      });
+    });
+
+    function updateCart() {
+      const ul = document.getElementById("cartItems");
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+      ul.innerHTML = cart.map(item => `<li>${item.name} - ${item.price}₺</li>`).join("");
+      document.getElementById("cartTotal").innerText = `${total}₺`;
+      document.getElementById("checkoutBtn").style.display = cart.length ? 'inline-block' : 'none';
+    }
+
+    document.getElementById("checkoutBtn").addEventListener("click", () => {
+      document.getElementById("fakeCardForm").style.display = 'block';
+    });
+
+    document.getElementById("fakeCardForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      document.getElementById("thankYouMsg").style.display = 'block';
+      document.getElementById("fakeCardForm").style.display = 'none';
+      cart = [];
+      updateCart();
+    });
+
+    document.getElementById("scrollBtn").addEventListener("click", () => {
+      document.getElementById("purchaseSection").scrollIntoView({ behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>
